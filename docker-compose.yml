@@ -1,0 +1,12 @@
+version: '2.1'
+
+services:
+  base:
+    image: jstriebel/nemo-eva
+    build: .
+    command: python3 crawler.py
+    volumes:
+      - "./data:/data"
+    environment:
+      - TZ=${TZ:-Europe/Berlin}
+    user: ${UID:-1000}:${GID:-1000}
