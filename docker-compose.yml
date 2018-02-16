@@ -1,12 +1,26 @@
-version: '2.1'
+version: '2.3'
 
 services:
-  base:
+  nemo-eva:
     image: jstriebel/nemo-eva
-    build: .
+    build:
+      context: .
+      target: nemo-eva
     command: python3 crawler.py
     volumes:
       - "./data:/data"
     environment:
       - TZ=${TZ:-Europe/Berlin}
     user: ${UID:-1000}:${GID:-1000}
+
+  dev:
+    image: jstriebel/nemo-eva-dev
+    extends: nemo-eva
+    build:
+      context: .
+      target: nemo-eva-dev
+    command: bash
+
+  lint:
+    extends: dev
+    command: pycodestyle --show-source --show-pep8 .

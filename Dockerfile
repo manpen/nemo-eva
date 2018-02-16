@@ -1,4 +1,4 @@
-FROM python:3.6-stretch
+FROM python:3.6-stretch as nemo-eva
 
 COPY requirements.txt /requirements.txt
 
@@ -8,3 +8,7 @@ COPY src /src
 
 WORKDIR /src
 CMD main.py
+
+FROM nemo-eva as nemo-eva-dev
+
+RUN pip3 install nose pep8

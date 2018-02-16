@@ -17,6 +17,9 @@ jobs:
       - run:
           name: Build docker image
           command: docker-compose build --pull 
+      - run:
+          name: Linting
+          command: docker-compose run --rm lint
 
 
 workflows:
