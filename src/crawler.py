@@ -7,6 +7,26 @@ import os
 from zipfile import ZipFile
 
 
+def convert_mtx_to_edges(in_path, out_path):
+    info_line_skipped = False
+    with open(in_path) as infile:
+        with open(out_path, "w") as outfile:
+            for line in infile:
+                if not line.startswith("%"):
+                    if info_line_skipped:
+                        outfile.write(line)
+                    else:
+                        info_line_skipped = True
+
+
+def limit_to_3_columns(in_path, out_path):
+    with open(in_path) as infile:
+        with open(out_path, "w") as outfile:
+            for line in infile:
+                reduced_line = " ".join(line.split(" ")[:3])
+                outfile.write(reduced_line)
+
+
 async def save_graph_from_zip(graph_zipped, name, group):
     potential_files = [
         i for i in graph_zipped.namelist() if
@@ -20,17 +40,24 @@ async def save_graph_from_zip(graph_zipped, name, group):
     filename = potential_files[0]
     if len(potential_files) > 1:
         print("too many possible file in zip, taking", filename, "/", name)
-    pure_filename = os.path.basename(filename)
     directory = (
         os.path.dirname(os.path.realpath(__file__)) +
         "/../data/1-graphs/{}/".format(group)
     )
+    target_filename = name + ".edges"
+    target_path = directory + target_filename
+    tmp_path = target_path + ".tmp"
     loop = asyncio.get_event_loop()
-    destination = await loop.run_in_executor(
+    zip_destination = await loop.run_in_executor(
         None, graph_zipped.extract, filename, directory)
-    if destination != directory + pure_filename:
-        os.rename(destination, directory + pure_filename)
-    return pure_filename
+    if zip_destination.endswith(".mtx"):
+        convert_mtx_to_edges(zip_destination, tmp_path)
+        os.remove(zip_destination)
+    else:
+        os.rename(zip_destination, tmp_path)
+    limit_to_3_columns(tmp_path, target_path)
+    os.remove(tmp_path)
+    return target_filename
 
 
 async def extract_links_from_page(
