@@ -11,4 +11,4 @@ CMD main.py
 
 FROM nemo-eva as nemo-eva-dev
 
-RUN pip3 install nose pep8
+RUN pip3 install nose pycodestyle
