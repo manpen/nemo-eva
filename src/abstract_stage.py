@@ -5,7 +5,7 @@ import os
 
 
 class AbstractStage(ABC):
-    """docstring for AbstractStage"""
+    """Abstract base class for stages of the data pipeline"""
     @property
     @abstractmethod
     def _stage(self):
@@ -34,8 +34,12 @@ class AbstractStage(ABC):
             self._dict_writer.writerow(a_dict)
 
     @abstractmethod
-    def execute(self, **kwargs):
+    def _execute(self):
         pass
 
-    def close(self):
+    def _close(self):
         self._results_file.close()
+
+    def execute(self):
+        self._execute()
+        self._close()

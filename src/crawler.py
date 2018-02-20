@@ -135,13 +135,11 @@ class GraphCrawler(AbstractStage):
             lambda x: x["size"] < 100000
         )
 
-    def execute(self, **kwargs):
+    def _execute(self):
         loop = asyncio.get_event_loop()
         # loop.set_default_executor(ProcessPoolExecutor())
         loop.run_until_complete(self.async_execute())
 
 
 if __name__ == "__main__":
-    crawler = GraphCrawler()
-    crawler.execute()
-    crawler.close()
+    GraphCrawler().execute()
