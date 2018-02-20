@@ -24,3 +24,23 @@ services:
   lint:
     extends: dev
     command: pycodestyle --show-source --show-pep8 .
+
+  test:
+    extends:
+      service: dev
+    command: pytest
+
+  dev-local:
+    extends: dev
+    volumes:
+      - "./src:/src"
+
+  test-local:
+    extends: test
+    volumes:
+      - "./src:/src"
+
+  lint-local:
+    extends: lint
+    volumes:
+      - "./src:/src"
