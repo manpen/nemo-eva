@@ -20,7 +20,9 @@ jobs:
       - run:
           name: Linting
           command: docker-compose run --rm lint
-
+      - run:
+          name: Run tests
+          command: docker-compose run --rm test
 
 workflows:
   version: 2
