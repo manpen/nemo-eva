@@ -11,7 +11,11 @@ from abstract_stage import AbstractStage
 
 class GraphCrawler(AbstractStage):
     """docstring for GraphCrawler"""
-    def __init__(self, groups=["bio"], graph_filter_func=lambda x: True):
+    def __init__(
+            self, groups=[
+                "bio", "bn", "ca", "chem", "eco", "ia",
+                "inf", "rec", "rt", "soc", "socfb", "tech", "web"],
+            graph_filter_func=lambda x: True):
         super(GraphCrawler, self).__init__()
         self.groups = groups
         self.graph_filter_func = graph_filter_func

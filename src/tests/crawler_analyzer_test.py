@@ -13,4 +13,4 @@ def is_stage_clean(stage):
 def test_graph_crawler():
     crawler = GraphCrawler()
     assert is_stage_clean(crawler)
-    # lambda x: x["size"] < 100000
+    crawler.execute(graph_filter_func=lambda x: x["nodes"] < 100000)
