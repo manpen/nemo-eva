@@ -6,7 +6,6 @@ services:
     build:
       context: .
       target: nemo-eva
-    command: python3 crawler.py
     volumes:
       - "./data:/data"
     environment:

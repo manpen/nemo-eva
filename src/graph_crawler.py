@@ -11,9 +11,10 @@ from abstract_stage import AbstractStage
 
 class GraphCrawler(AbstractStage):
     """docstring for GraphCrawler"""
-    # def __init__(self, arg):
-    #     super(GraphCrawler, self).__init__()
-    #     self.arg = arg
+    def __init__(self, groups=["bio"], graph_filter_func=lambda x: True):
+        super(GraphCrawler, self).__init__()
+        self.groups = groups
+        self.graph_filter_func = graph_filter_func
     _stage = "1-graphs"
 
     def convert_mtx_to_edges(self, in_path, out_path):
@@ -66,8 +67,7 @@ class GraphCrawler(AbstractStage):
         os.remove(tmp_path)
         return target_filename
 
-    async def extract_links_from_page(
-            self, session, group, html, filter):
+    async def extract_links_from_page(self, session, group, html):
         parsed_html = BeautifulSoup(html, "html.parser")
         table = parsed_html.find(id="myTable")
         rows = table.find_all("tr")
@@ -98,7 +98,7 @@ class GraphCrawler(AbstractStage):
             }
         for row in rows[1:]:
             graph_nr_properties = parse_row(row)
-            if filter is not None and not filter(graph_nr_properties):
+            if self.graph_filter_func(graph_nr_properties):
                 continue
             async with session.get(graph_nr_properties["url"]) as response:
                 with ZipFile(BytesIO(await response.read()), "r") as zipped:
@@ -111,35 +111,23 @@ class GraphCrawler(AbstractStage):
                 graph_nr_properties["path"] = graph_path
                 self._save_as_csv(graph_nr_properties)
 
-    async def get_page_html(self, session, group, filter):
+    async def get_page_html(self, session, group):
         url = "http://networkrepository.com/{}.php".format(group)
         async with session.get(url) as response:
             html = await response.text()
-            await self.extract_links_from_page(
-                session, group, html, filter
-            )
+            await self.extract_links_from_page(session, group, html)
 
-    async def crawl_graphs(self, groups, filter=None):
+    async def crawl_graphs(self):
         async with aiohttp.ClientSession() as session:
             session_tasks = []
-            for group in groups:
+            for group in self.groups:
                 task = asyncio.ensure_future(
-                    self.get_page_html(session, group, filter)
+                    self.get_page_html(session, group)
                 )
                 session_tasks.append(task)
             await asyncio.wait(session_tasks)
 
-    async def async_execute(self):
-        await self.crawl_graphs(
-            ["bio"],
-            lambda x: x["size"] < 100000
-        )
-
     def _execute(self):
         loop = asyncio.get_event_loop()
         # loop.set_default_executor(ProcessPoolExecutor())
-        loop.run_until_complete(self.async_execute())
-
-
-if __name__ == "__main__":
-    GraphCrawler().execute()
+        loop.run_until_complete(self.crawl_graphs)

@@ -11,4 +11,4 @@ CMD main.py
 
 FROM nemo-eva as nemo-eva-dev
 
-RUN pip3 install pycodestyle pytest
+RUN pip3 install pycodestyle pytest pytest-ordering
