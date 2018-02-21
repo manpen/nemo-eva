@@ -134,4 +134,4 @@ class GraphCrawler(AbstractStage):
     def _execute(self):
         loop = asyncio.get_event_loop()
         # loop.set_default_executor(ProcessPoolExecutor())
-        loop.run_until_complete(self.crawl_graphs)
+        loop.run_until_complete(self.crawl_graphs())

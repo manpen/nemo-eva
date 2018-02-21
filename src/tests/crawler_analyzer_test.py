@@ -11,6 +11,6 @@ def is_stage_clean(stage):
 
 @pytest.mark.first
 def test_graph_crawler():
-    crawler = GraphCrawler()
+    crawler = GraphCrawler(graph_filter_func=lambda x: x["nodes"] < 100000)
     assert is_stage_clean(crawler)
-    crawler.execute(graph_filter_func=lambda x: x["nodes"] < 100000)
+    crawler.execute()
