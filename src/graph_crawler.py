@@ -11,6 +11,8 @@ from abstract_stage import AbstractStage
 
 class GraphCrawler(AbstractStage):
     """docstring for GraphCrawler"""
+    _stage = "1-graphs"
+    
     def __init__(
             self, groups=[
                 "bio", "bn", "ca", "chem", "eco", "ia",
@@ -19,7 +21,6 @@ class GraphCrawler(AbstractStage):
         super(GraphCrawler, self).__init__()
         self.groups = groups
         self.graph_filter_func = graph_filter_func
-    _stage = "1-graphs"
 
     def convert_mtx_to_edges(self, in_path, out_path):
         info_line_skipped = False
@@ -80,11 +81,11 @@ class GraphCrawler(AbstractStage):
         # Graph Name |V| |E| dmax davg r |T|
         # Tavg Tmax κavg κ K ωheu Size Download
         indices = {
-            "name": headers.index("Graph Name"),
-            "url": headers.index("Download"),
-            "nodes": headers.index("|V|"),
-            "edges": headers.index("|E|"),
-            "size": headers.index("Size"),
+            "Name": headers.index("Graph Name"),
+            "Url": headers.index("Download"),
+            "Nodes": headers.index("|V|"),
+            "Edges": headers.index("|E|"),
+            "Size": headers.index("Size"),
         }
 
         def get_sort_value(element):
@@ -94,25 +95,25 @@ class GraphCrawler(AbstractStage):
             elements = row.find_all("td")
             return {
                 "group": group,
-                "name": elements[indices["name"]].text.strip(),
-                "url": elements[indices["url"]].find("a").get("href"),
-                "nodes": get_sort_value(elements[indices["nodes"]]),
-                "edges": get_sort_value(elements[indices["edges"]]),
-                "size": get_sort_value(elements[indices["size"]])
+                "Name": elements[indices["Name"]].text.strip(),
+                "Url": elements[indices["Url"]].find("a").get("href"),
+                "Nodes": get_sort_value(elements[indices["Nodes"]]),
+                "Edges": get_sort_value(elements[indices["Edges"]]),
+                "Size": get_sort_value(elements[indices["Size"]])
             }
         for row in rows[1:]:
             graph_nr_properties = parse_row(row)
             if self.graph_filter_func(graph_nr_properties):
                 continue
-            async with session.get(graph_nr_properties["url"]) as response:
+            async with session.get(graph_nr_properties["Url"]) as response:
                 with ZipFile(BytesIO(await response.read()), "r") as zipped:
                     graph_path = await self.save_graph_from_zip(
-                        zipped, graph_nr_properties["name"], group
+                        zipped, graph_nr_properties["Name"], group
                     )
             if graph_path is None:
-                print("skipping", url, "/", graph_nr_properties["name"])
+                print("skipping", url, "/", graph_nr_properties["Name"])
             else:
-                graph_nr_properties["path"] = graph_path
+                graph_nr_properties["Path"] = graph_path
                 self._save_as_csv(graph_nr_properties)
 
     async def get_page_html(self, session, group):
