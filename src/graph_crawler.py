@@ -12,7 +12,7 @@ from abstract_stage import AbstractStage
 class GraphCrawler(AbstractStage):
     """docstring for GraphCrawler"""
     _stage = "1-graphs"
-    
+
     def __init__(
             self, groups=[
                 "bio", "bn", "ca", "chem", "eco", "ia",
