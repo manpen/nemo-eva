@@ -6,8 +6,6 @@ services:
     build:
       context: .
       target: nemo-eva
-    volumes:
-      - "./data:/data"
     environment:
       - TZ=${TZ:-Europe/Berlin}
     user: ${UID:-1000}:${GID:-1000}
@@ -32,14 +30,17 @@ services:
   dev-local:
     extends: dev
     volumes:
+      - "./data:/data"
       - "./src:/src"
 
   test-local:
     extends: test
     volumes:
+      - "./data:/data"
       - "./src:/src"
 
   lint-local:
     extends: lint
     volumes:
+      - "./data:/data"
       - "./src:/src"
