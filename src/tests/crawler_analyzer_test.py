@@ -17,11 +17,11 @@ def results_path(stage):
 
 @pytest.mark.first
 def test_graph_crawler():
-    assert is_stage_clean(crawler)
 
     def graph_filter_func(graph_properties):
         return int(graph_properties["Nodes"]) < 10000
     crawler = GraphCrawler(graph_filter_func=graph_filter_func)
+    assert is_stage_clean(crawler)
     crawler.execute()
 
     with open(results_path(crawler)) as crawl_results:
