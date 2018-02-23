@@ -1,4 +1,5 @@
 aiohttp
 asyncio
+backoff
 beautifulsoup4
 futures

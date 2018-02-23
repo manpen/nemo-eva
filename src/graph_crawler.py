@@ -1,5 +1,6 @@
 import asyncio
 import aiohttp
+import backoff
 from bs4 import BeautifulSoup
 from concurrent.futures import ProcessPoolExecutor
 from io import BytesIO
@@ -40,6 +41,9 @@ class GraphCrawler(AbstractStage):
                     reduced_line = " ".join(line.split(" ")[:3])
                     outfile.write(reduced_line)
 
+    @backoff.on_exception(backoff.expo,
+                          FileExistsError,
+                          max_tries=3)
     async def save_graph_from_zip(self, graph_zipped, name, group):
         potential_files = [
             i for i in graph_zipped.namelist() if
@@ -72,6 +76,23 @@ class GraphCrawler(AbstractStage):
         os.remove(tmp_path)
         return target_filename
 
+    @backoff.on_exception(backoff.expo,
+                          aiohttp.client_exceptions.ServerDisconnectedError,
+                          max_tries=15)
+    async def download_graph(self, session, group, graph_nr_properties):
+        async with session.get(graph_nr_properties["Url"]) as response:
+            with ZipFile(BytesIO(await response.read()), "r") as zipped:
+                graph_path = await self.save_graph_from_zip(
+                    zipped, graph_nr_properties["Name"], group
+                )
+        if graph_path is None:
+            print(
+                "skipping",
+                graph_nr_properties["Url"], "/", graph_nr_properties["Name"])
+        else:
+            graph_nr_properties["Path"] = graph_path
+            self._save_as_csv(graph_nr_properties)
+
     async def extract_links_from_page(self, session, group, html):
         parsed_html = BeautifulSoup(html, "html.parser")
         table = parsed_html.find(id="myTable")
@@ -94,27 +115,22 @@ class GraphCrawler(AbstractStage):
         def parse_row(row):
             elements = row.find_all("td")
             return {
-                "group": group,
+                "Group": group,
                 "Name": elements[indices["Name"]].text.strip(),
                 "Url": elements[indices["Url"]].find("a").get("href"),
                 "Nodes": get_sort_value(elements[indices["Nodes"]]),
                 "Edges": get_sort_value(elements[indices["Edges"]]),
                 "Size": get_sort_value(elements[indices["Size"]])
             }
+        download_tasks = []
         for row in rows[1:]:
             graph_nr_properties = parse_row(row)
             if self.graph_filter_func(graph_nr_properties):
-                continue
-            async with session.get(graph_nr_properties["Url"]) as response:
-                with ZipFile(BytesIO(await response.read()), "r") as zipped:
-                    graph_path = await self.save_graph_from_zip(
-                        zipped, graph_nr_properties["Name"], group
-                    )
-            if graph_path is None:
-                print("skipping", url, "/", graph_nr_properties["Name"])
-            else:
-                graph_nr_properties["Path"] = graph_path
-                self._save_as_csv(graph_nr_properties)
+                task = asyncio.ensure_future(
+                    self.download_graph(session, group, graph_nr_properties)
+                )
+                download_tasks.append(task)
+        await asyncio.wait(download_tasks)
 
     async def get_page_html(self, session, group):
         url = "http://networkrepository.com/{}.php".format(group)
@@ -123,7 +139,11 @@ class GraphCrawler(AbstractStage):
             await self.extract_links_from_page(session, group, html)
 
     async def crawl_graphs(self):
-        async with aiohttp.ClientSession() as session:
+        connector = aiohttp.TCPConnector(
+            limit_per_host=10,
+            force_close=False,
+            keepalive_timeout=20)
+        async with aiohttp.ClientSession(connector=connector) as session:
             session_tasks = []
             for group in self.groups:
                 task = asyncio.ensure_future(

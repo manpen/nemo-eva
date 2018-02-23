@@ -28,7 +28,10 @@ class AbstractStage(ABC):
             if self._dict_writer is None:
                 fieldnames = sorted(a_dict.keys())
                 if not os.path.exists(self._stagepath):
-                    os.makedirs(self._stagepath)
+                    try:
+                        os.makedirs(self._stagepath)
+                    except FileExistsError:
+                        pass
                 self._results_file = open(self._stagepath + "results.csv", "w")
                 self._dict_writer = DictWriter(self._results_file, fieldnames)
                 self._dict_writer.writeheader()
