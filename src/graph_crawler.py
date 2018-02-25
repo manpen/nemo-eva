@@ -5,14 +5,18 @@ from bs4 import BeautifulSoup
 from concurrent.futures import ProcessPoolExecutor
 from io import BytesIO
 import os
-from zipfile import ZipFile
+from zipfile import BadZipFile, ZipFile
 
 from abstract_stage import AbstractStage
 
 
 class GraphCrawler(AbstractStage):
-    """docstring for GraphCrawler"""
+    """TODO docstring for GraphCrawler"""
     _stage = "1-graphs"
+
+    async def backoff_hdlr(details):
+        print("Backing off {wait:0.1f} seconds afters {tries} tries "
+              "with args {args}".format(**details), flush=True)
 
     def __init__(
             self, groups=[
@@ -43,13 +47,14 @@ class GraphCrawler(AbstractStage):
 
     @backoff.on_exception(backoff.expo,
                           FileExistsError,
-                          max_tries=3)
+                          on_backoff=backoff_hdlr,
+                          max_tries=50)
     async def save_graph_from_zip(self, graph_zipped, name, group):
         potential_files = [
             i for i in graph_zipped.namelist() if
-            name + ".edges" in i or
-            name + ".mtx" in i or
-            name + ".txt" in i
+            i.endswith(".edges") or
+            i.endswith(".mtx") or
+            i.endswith(".txt")
         ]
         if len(potential_files) == 0:
             print("could not find valid file in zip /", name)
@@ -78,13 +83,23 @@ class GraphCrawler(AbstractStage):
 
     @backoff.on_exception(backoff.expo,
                           aiohttp.client_exceptions.ServerDisconnectedError,
-                          max_tries=15)
+                          on_backoff=backoff_hdlr,
+                          max_tries=50)
     async def download_graph(self, session, group, graph_nr_properties):
-        async with session.get(graph_nr_properties["Url"]) as response:
-            with ZipFile(BytesIO(await response.read()), "r") as zipped:
-                graph_path = await self.save_graph_from_zip(
-                    zipped, graph_nr_properties["Name"], group
-                )
+        try:
+            async with session.get(graph_nr_properties["Url"],
+                                   timeout=10*60) as response:
+                zipped_bytes = BytesIO(await response.read())
+                try:
+                    with ZipFile(zipped_bytes, "r") as zipped:
+                        graph_path = await self.save_graph_from_zip(
+                            zipped, graph_nr_properties["Name"], group
+                        )
+                except BadZipFile as e:
+                    print(e, flush=True)
+                    graph_path = None
+        except asyncio.TimeoutError:
+            graph_path = None
         if graph_path is None:
             print(
                 "skipping",
@@ -124,7 +139,11 @@ class GraphCrawler(AbstractStage):
             }
         download_tasks = []
         for row in rows[1:]:
-            graph_nr_properties = parse_row(row)
+            try:
+                graph_nr_properties = parse_row(row)
+            except Exception as e:
+                print("Error parsing html row:", e)
+                continue
             if self.graph_filter_func(graph_nr_properties):
                 task = asyncio.ensure_future(
                     self.download_graph(session, group, graph_nr_properties)
@@ -132,6 +151,10 @@ class GraphCrawler(AbstractStage):
                 download_tasks.append(task)
         await asyncio.wait(download_tasks)
 
+    @backoff.on_exception(backoff.expo,
+                          aiohttp.client_exceptions.ServerDisconnectedError,
+                          on_backoff=backoff_hdlr,
+                          max_tries=50)
     async def get_page_html(self, session, group):
         url = "http://networkrepository.com/{}.php".format(group)
         async with session.get(url) as response:
@@ -139,11 +162,12 @@ class GraphCrawler(AbstractStage):
             await self.extract_links_from_page(session, group, html)
 
     async def crawl_graphs(self):
-        connector = aiohttp.TCPConnector(
-            limit_per_host=10,
-            force_close=False,
-            keepalive_timeout=20)
-        async with aiohttp.ClientSession(connector=connector) as session:
+        connector = aiohttp.TCPConnector(limit_per_host=10,
+                                         force_close=False,
+                                         keepalive_timeout=20)
+        async with aiohttp.ClientSession(connector=connector,
+                                         read_timeout=None,
+                                         conn_timeout=None) as session:
             session_tasks = []
             for group in self.groups:
                 task = asyncio.ensure_future(
@@ -151,6 +175,16 @@ class GraphCrawler(AbstractStage):
                 )
                 session_tasks.append(task)
             await asyncio.wait(session_tasks)
+            # waiting for backoffs:
+            # current_task = asyncio.Task.current_task()
+            # while True:
+            #     await asyncio.sleep(3)
+            #     tasks_undone = [
+            #         task for task in asyncio.Task.all_tasks()
+            #         if not task.done() and task != current_task]
+            #     if tasks_undone == []:
+            #         return
+            #     await asyncio.wait(tasks_undone)
 
     def _execute(self):
         loop = asyncio.get_event_loop()
