@@ -39,8 +39,9 @@ def test_graph_crawler():
 
     wrong_names = ["bn-fly-drosophila_medulla_1", "bn-macaque-rhesus_brain_1"]
     paper_features = [
-        i.replace("_", "-") if i in wrong_names else
-        i in paper_features
+        i.replace("_", "-") if i in wrong_names
+        else i
+        for i in paper_features
     ]
 
     print("More:", filtered_paper_graphs - crawled_graphs)
