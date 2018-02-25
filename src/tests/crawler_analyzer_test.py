@@ -38,12 +38,11 @@ def test_graph_crawler():
         )
 
     wrong_names = ["bn-fly-drosophila_medulla_1", "bn-macaque-rhesus_brain_1"]
-    paper_features = [
+    filtered_paper_graphs = set(
         i.replace("_", "-") if i in wrong_names
         else i
-        for i in paper_features
-    ]
+        for i in filtered_paper_graphs
+    )
 
-    print("More:", filtered_paper_graphs - crawled_graphs)
     print("Missing:", filtered_paper_graphs - crawled_graphs)
     assert crawled_graphs >= filtered_paper_graphs
