@@ -32,13 +32,13 @@ class FeatureExtractor(AbstractStage):
 
     def __init__(self, graph_dicts):
         super(FeatureExtractor, self).__init__()
-        self.graph_dicts = graph_dicts  # [dict(i) for i in graph_dicts]
+        self.graph_dicts = graph_dicts
         networkit.engineering.setNumberOfThreads(1)
 
-    def getDeepValue(self, aDict, keylist):
+    def getDeepValue(self, a_dict, keylist):
         for subkey in keylist:
-            aDict = aDict[subkey]
-        return aDict
+            a_dict = a_dict[subkey]
+        return a_dict
 
     def shrink_to_giant_component(self, g):
         comp = networkit.components.ConnectedComponents(g)
@@ -254,8 +254,8 @@ class FeatureExtractor(AbstractStage):
                 self.fit_hyperbolic)
         ]
 
-        outputs = []
-        all_keys = set()
+        # outputs = []
+        # all_keys = set()
         for model_name, model_converter in model_types:
             try:
                 info, model = model_converter(g)
@@ -263,17 +263,17 @@ class FeatureExtractor(AbstractStage):
             except ZeroDivisionError as e:
                 print("Error:", e, "for", model_name, "of", g.getName(), model)
             else:
-                outputs.append((model_name, info, output))
-                all_keys |= set(output.keys())
+                output["Graph"] = g.getName()
+                output["Type"] = graph_type
+                output["Model"] = model_name
+                output["Info"] = info
+                self._save_as_csv(output)
+                # outputs.append((model_name, info, output))
+                # all_keys |= set(output.keys())
 
-        for model_name, info, output in sorted(outputs):
-            for key in all_keys - set(output.keys()):
-                output[key] = float("nan")
-            output["Graph"] = g.getName()
-            output["Type"] = graph_type
-            output["Model"] = model_name
-            output["Info"] = info
-            self._save_as_csv(output)
+        # for model_name, info, output in sorted(outputs):
+            # for key in all_keys - set(output.keys()):
+            #    output[key] = float("nan")
 
     def _execute(self):
         pool = NoDaemonProcessPool()
