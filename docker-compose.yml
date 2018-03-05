@@ -8,6 +8,7 @@ services:
       target: nemo-eva
     environment:
       - TZ=${TZ:-Europe/Berlin}
+      - DISPLAY=:99
     user: ${UID:-1000}:${GID:-1000}
 
   dev:
@@ -25,7 +26,12 @@ services:
   test:
     extends:
       service: dev
-    command: pytest -s
+    command:
+      - sh
+      - -c
+      - >
+        Xvfb $$DISPLAY -screen 0 800x600x8 -ac +render -noreset &
+        pytest -s
 
   dev-local:
     extends: dev

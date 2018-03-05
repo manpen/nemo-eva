@@ -10,11 +10,6 @@ def is_stage_clean(stage):
     return not os.path.exists(path) or os.listdir(path) == []
 
 
-def results_path(stage):
-    path = stage._stagepath
-    return path + "results.csv"
-
-
 @pytest.mark.first
 def test_graph_crawler():
     def graph_filter_func(graph_properties):
@@ -25,7 +20,7 @@ def test_graph_crawler():
     assert is_stage_clean(crawler)
     crawler.execute()
 
-    with open(results_path(crawler)) as crawl_results:
+    with open(crawler.resultspath) as crawl_results:
         crawled_graphs = set(
             i["Name"] for i in DictReader(crawl_results)
         )

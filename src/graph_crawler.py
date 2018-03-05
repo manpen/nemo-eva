@@ -175,16 +175,6 @@ class GraphCrawler(AbstractStage):
                 )
                 session_tasks.append(task)
             await asyncio.wait(session_tasks)
-            # waiting for backoffs:
-            # current_task = asyncio.Task.current_task()
-            # while True:
-            #     await asyncio.sleep(3)
-            #     tasks_undone = [
-            #         task for task in asyncio.Task.all_tasks()
-            #         if not task.done() and task != current_task]
-            #     if tasks_undone == []:
-            #         return
-            #     await asyncio.wait(tasks_undone)
 
     def _execute(self):
         loop = asyncio.get_event_loop()
