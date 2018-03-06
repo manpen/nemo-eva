@@ -82,7 +82,10 @@ class GraphCrawler(AbstractStage):
         return target_filename
 
     @backoff.on_exception(backoff.expo,
-                          aiohttp.client_exceptions.ServerDisconnectedError,
+                          (
+                            aiohttp.client_exceptions.ServerDisconnectedError,
+                            aiohttp.client_exceptions.ClientPayloadError
+                          ),
                           on_backoff=backoff_hdlr,
                           max_tries=50)
     async def download_graph(self, session, group, graph_nr_properties):
