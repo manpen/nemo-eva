@@ -155,7 +155,10 @@ class GraphCrawler(AbstractStage):
         await asyncio.wait(download_tasks)
 
     @backoff.on_exception(backoff.expo,
-                          aiohttp.client_exceptions.ServerDisconnectedError,
+                          (
+                            aiohttp.client_exceptions.ServerDisconnectedError,
+                            aiohttp.client_exceptions.ClientPayloadError
+                          ),
                           on_backoff=backoff_hdlr,
                           max_tries=50)
     async def get_page_html(self, session, group):
