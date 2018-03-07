@@ -91,7 +91,7 @@ class GraphCrawler(AbstractStage):
     async def download_graph(self, session, group, graph_nr_properties):
         try:
             async with session.get(graph_nr_properties["Url"],
-                                   timeout=10*60) as response:
+                                   timeout=30*60) as response:
                 zipped_bytes = BytesIO(await response.read())
                 try:
                     with ZipFile(zipped_bytes, "r") as zipped:
