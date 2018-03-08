@@ -171,8 +171,8 @@ class GraphCrawler(AbstractStage):
         connector = aiohttp.TCPConnector(limit_per_host=10,
                                          force_close=True,
                                          enable_cleanup_closed=True)
-                                         #force_close=False,
-                                         #keepalive_timeout=20)
+        # force_close=False,
+        # keepalive_timeout=20)
         async with aiohttp.ClientSession(connector=connector,
                                          read_timeout=None,
                                          conn_timeout=None) as session:
