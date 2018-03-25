@@ -10,3 +10,8 @@ docker-compose build nemo-eva && docker-compose run --rm nemo-eva
 ```
 docker-compose build lint && docker-compose run --rm lint
 ```
+
+## Licenses
+
+* src/notebooks/renderjson.js: ISC License
+* networkrepository

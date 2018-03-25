@@ -16,13 +16,13 @@ jobs:
       - checkout
       - run:
           name: Build docker image
-          command: docker-compose build --pull 
+          command: docker-compose build --pull
       - run:
           name: Linting
-          command: docker-compose run --rm lint
+          command: docker-compose run --rm dev lint
       - run:
           name: Run tests
-          command: docker-compose run --rm test
+          command: docker-compose run --rm dev test
           no_output_timeout: 60m
 
 workflows:

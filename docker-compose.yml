@@ -6,10 +6,13 @@ services:
     build:
       context: .
       target: nemo-eva
+    command: make
     environment:
       - TZ=${TZ:-Europe/Berlin}
       - DISPLAY=:99
     user: ${UID:-1000}:${GID:-1000}
+    ports:
+      - "8888:8888"
 
   dev:
     image: jstriebel/nemo-eva-dev
@@ -17,36 +20,9 @@ services:
     build:
       context: .
       target: nemo-eva-dev
-    command: bash
-
-  lint:
-    extends: dev
-    command: pycodestyle --show-source --show-pep8 .
-
-  test:
-    extends:
-      service: dev
-    command:
-      - sh
-      - -c
-      - >
-        Xvfb $$DISPLAY -screen 0 800x600x8 -ac +render -noreset &
-        pytest -s
 
   dev-local:
     extends: dev
-    volumes:
-      - "./data:/data"
-      - "./src:/src"
-
-  test-local:
-    extends: test
-    volumes:
-      - "./data:/data"
-      - "./src:/src"
-
-  lint-local:
-    extends: lint
     volumes:
       - "./data:/data"
       - "./src:/src"
