@@ -17,6 +17,7 @@ services:
   dev:
     image: jstriebel/nemo-eva-dev
     extends: nemo-eva
+    command: sh
     build:
       context: .
       target: nemo-eva-dev
