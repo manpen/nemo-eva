@@ -15,15 +15,49 @@ jobs:
       - setup_remote_docker
       - checkout
       - run:
-          name: Build docker image
-          command: docker-compose build --pull
+          name: Pull similar docker images
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker pull jstriebel/nemo-eva:${CIRCLE_BRANCH} || \
+            docker pull jstriebel/nemo-eva:master || true
+            docker pull jstriebel/nemo-eva-dev:${CIRCLE_BRANCH} || \
+            docker pull jstriebel/nemo-eva-dev:master || true
+            docker logout
       - run:
-          name: Linting
+          name: Build docker images
+          command: |
+            docker build \
+              --target nemo-eva \
+              -t jstriebel/nemo-eva \
+              --cache-from jstriebel/nemo-eva:${CIRCLE_BRANCH} \
+              --cache-from jstriebel/nemo-eva:master \
+              .
+            docker build \
+              --target nemo-eva-dev \
+              -t jstriebel/nemo-eva-dev \
+              --cache-from jstriebel/nemo-eva-dev:${CIRCLE_BRANCH} \
+              --cache-from jstriebel/nemo-eva-dev:master \
+              .
+      - run:
+          name: Lint
           command: docker-compose run --rm dev make lint
       - run:
           name: Run tests
           command: docker-compose run --rm dev make test
           no_output_timeout: 60m
+      - run:
+          name: Push docker images
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+
+            for image in jstriebel/nemo-eva jstriebel/nemo-eva-dev; do
+              docker tag $image $image:${CIRCLE_BRANCH}
+              docker push       $image:${CIRCLE_BRANCH}
+              docker tag $image $image:${CIRCLE_BRANCH}__${CIRCLE_BUILD_NUM}
+              docker push       $image:${CIRCLE_BRANCH}__${CIRCLE_BUILD_NUM}
+            done
+
+            docker logout
 
 workflows:
   version: 2
