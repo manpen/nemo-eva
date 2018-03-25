@@ -40,6 +40,7 @@ jobs:
             docker build \
               --target nemo-eva-dev \
               -t jstriebel/nemo-eva-dev \
+              --cache-from jstriebel/nemo-eva \
               --cache-from jstriebel/nemo-eva-dev:${CIRCLE_BRANCH} \
               --cache-from jstriebel/nemo-eva-dev:master \
               .
