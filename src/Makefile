@@ -1,12 +1,14 @@
 DATA_FOLDERS = $(subst /,,$(subst ../data/,,$(dir $(wildcard ../data/*/results.csv))))
 
 open-notebooks:
-	HOME=/src jupyter-notebook -y --ip=0.0.0.0 --no-browser notebooks
+	HOME=/src PYTHONPATH=$$(pwd) \
+	jupyter-notebook -y --ip=0.0.0.0 --no-browser notebooks
 
 render-notebooks:
 	export HOME=/src && \
+	export PYTHONPATH=$$(pwd) && \
 	cd notebooks && \
-	for f in 3-cleaned_features.ipynb; do \
+	for f in "*.ipynb"; do \
 		jupyter nbconvert \
 			--ExecutePreprocessor.timeout=6000\
 			--execute \

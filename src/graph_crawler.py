@@ -11,7 +11,6 @@ from abstract_stage import AbstractStage
 
 
 class GraphCrawler(AbstractStage):
-    """TODO docstring for GraphCrawler"""
     _stage = "1-graphs"
 
     async def backoff_hdlr(details):

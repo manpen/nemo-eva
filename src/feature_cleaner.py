@@ -1,37 +1,22 @@
-import csv
 import numpy
-import os
 import pandas
 
 from functools import reduce
-from io import StringIO
 
 from abstract_stage import AbstractStage
+from helpers import dicts_to_df
 
 
 class FeatureCleaner(AbstractStage):
     _stage = "3-cleaned_features"
-
-    def dicts_to_dataframe(self, dicts):
-        assert len(dicts) > 0
-        csv_buffer = StringIO()
-        dict_writer = csv.DictWriter(csv_buffer, dicts[0].keys())
-        dict_writer.writeheader()
-        dict_writer.writerows(dicts)
-        csv_buffer.seek(0)
-        return pandas.read_csv(csv_buffer)
 
     def __init__(self, features):
         super(FeatureCleaner, self).__init__()
         self.features = features
 
     def _execute(self):
-        df = self.dicts_to_dataframe(self.features)
-
-        # sort df
+        df = dicts_to_df(self.features)
         df.sort_index(axis=1, inplace=True)
-        # df.sort("Nodes", inplace=True)
-        # df = df.reindex(index=range(len(df.index)))
 
         # fill information
         df.columns.name = "Feature"

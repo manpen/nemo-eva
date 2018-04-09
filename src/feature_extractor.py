@@ -12,7 +12,7 @@ import os
 
 from abstract_stage import AbstractStage
 from graph_crawler import GraphCrawler
-from print_blocker import PrintBlocker
+from helpers.print_blocker import PrintBlocker
 
 
 class NoDaemonProcessPool(multiprocessing.pool.Pool):

@@ -4,21 +4,29 @@ import multiprocessing
 import os
 
 
+class classproperty(object):
+    def __init__(self, f):
+        self.f = f
+
+    def __get__(self, obj, owner):
+        return self.f(owner)
+
+
 class AbstractStage(ABC):
     """Abstract base class for stages of the data pipeline"""
-    @property
+    @classproperty
     @abstractmethod
     def _stage(self):
         pass
 
-    @property
+    @classproperty
     def _stagepath(self):
         return (
             os.path.dirname(os.path.realpath(__file__)) +
             "/../data/{}/".format(self._stage)
         )
 
-    @property
+    @classproperty
     def resultspath(self):
         return (
             self._stagepath + "results.csv"
