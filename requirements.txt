@@ -3,10 +3,8 @@ scipy==0.14.*
 scikit-learn==0.19.*
 
 aiohttp
-asyncio
 backoff
 beautifulsoup4
-futures
 ipython==6.2.*
 matplotlib
 mpmath==1.0.*
