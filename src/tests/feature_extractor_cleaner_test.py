@@ -47,7 +47,7 @@ def test_feature_extractor_and_cleaner():
     with open(extractor._stagepath + "../paper-features.csv") as file:
         paper_features = set(
             i for i in get_hash_dicts(file)
-            # if i["Graph"] in stage1_names
+            if i["Graph"] in stage1_names
         )
 
     def get_tuple(x):
@@ -67,5 +67,3 @@ def test_feature_extractor_and_cleaner():
                     assert numpy.allclose(float(i[key]), float(j[key]))
                 except Exception as e:
                     assert i[key] == j[key]
-
-    # assert extracted_features >= paper_features
