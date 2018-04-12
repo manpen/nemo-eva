@@ -3,6 +3,8 @@ from csv import DictWriter
 import multiprocessing
 import os
 
+from config import data_path
+
 
 class classproperty(object):
     def __init__(self, f):
@@ -21,10 +23,7 @@ class AbstractStage(ABC):
 
     @classproperty
     def _stagepath(self):
-        return (
-            os.path.dirname(os.path.realpath(__file__)) +
-            "/../data/{}/".format(self._stage)
-        )
+        return data_path + self._stage + "/"
 
     @classproperty
     def resultspath(self):

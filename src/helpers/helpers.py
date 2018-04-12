@@ -8,11 +8,6 @@ from io import StringIO
 
 _render_dict_counter = 0
 
-
-def data_path():
-    return "/data/"
-
-
 def list_to_dict(a_list, delimiter):
     the_dict = {}
     for entry in a_list:
