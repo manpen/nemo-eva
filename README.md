@@ -1,9 +1,9 @@
 # NeMo-Eva
 The quantitative Network Model Evaluation framework
 
-> Thomas Bläsius, Tobias Friedrich, Maximilian Katzmann, Anton Krohmer and Jonathan Striebel
-Towards a Systematic Evaluation of Generative Network Models
-[15th Workshop on Algorithms and Models for the Web Graph (2018)](http://www.math.ryerson.ca/waw2018/)
+> Thomas Bläsius, Tobias Friedrich, Maximilian Katzmann, Anton Krohmer and Jonathan Striebel  
+Towards a Systematic Evaluation of Generative Network Models  
+[15th Workshop on Algorithms and Models for the Web Graph (2018)](http://www.math.ryerson.ca/waw2018/)  
 ![HPI logo](https://hpi.de/fileadmin/user_upload/hpi/bilder/logos/hpi_logo_web.jpg)
 
 [![CircleCI](https://circleci.com/gh/jstriebel/nemo-eva.svg?style=svg)](https://circleci.com/gh/jstriebel/nemo-eva)
@@ -11,8 +11,8 @@ Towards a Systematic Evaluation of Generative Network Models
 ## Usage
 
 You can view the paper results rendered on github within this repo:
-* [Graph Features](src/notebooks/graph features.ipynb)
-* [Classification Results](src/notebooks/classification results.ipynb)
+* [Graph Features](src/notebooks/graph%20features.ipynb)
+* [Classification Results](src/notebooks/classification%20results.ipynb)
 
 Adapting the notebooks interactively online migth work in the future with binder (TODO):
 [Interactive online notebooks](https://mybinder.org/v2/gh/jstriebel/nemo-eva/master?filepath=src%2Fnotebooks)
@@ -62,8 +62,8 @@ Pull Requests are welcome!
 ## Reproducibility
 
 Many measures have been take to make the experiments reproducible:
-* docker images make sure that all dependencies can be met and their versions are consistent
-* the analyzed networks are publicly accessible via the [Network Repository](http://networkrepository.com).
+* Docker images make sure that all dependencies can be met and their versions are consistent.
+* The analyzed networks are publicly accessible via the [Network Repository](http://networkrepository.com).
 * Intermediate results are published in this repo in [paper-data](paper-data).
   * Tests ensure that those results can be reproduced from scratch.
   * The results can be used to run custom classification experiments easily.
@@ -105,6 +105,6 @@ The directly imported python packages are released under the following licenses:
 | seaborn | BSD (3-clause) |
 | tabulate | MIT |
 
-Additionally, [renderjson.js](src/helpers/renderjson.js) is used, which is released under the ISC License.
+Additionally, [renderjson.js](src/notebooks/renderjson.js) is used, which is released under the ISC License.
 
 All other parts which are created for NeMo-Eva are released under the [MIT License](LICENSE.txt).
