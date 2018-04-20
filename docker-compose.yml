@@ -8,9 +8,8 @@ services:
       target: nemo-eva
     command: make
     environment:
-      - TZ=${TZ:-Europe/Berlin}
       - DISPLAY=:99
-    user: ${UID:-1000}:${GID:-1000}
+      - DATA_PATH=${DATA_PATH:-/data/}
     ports:
       - "8888:8888"
 
@@ -26,4 +25,5 @@ services:
     extends: dev
     volumes:
       - "./data:/data"
+      - "./data-paper:/data-paper"
       - "./src:/src"

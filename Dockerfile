@@ -13,8 +13,9 @@ RUN apk --no-cache add --virtual build-deps \
 RUN apk --no-cache add make libgomp libstdc++ lapack xvfb
 
 RUN mkdir /data
-COPY data/paper-features.csv /data/paper-features.csv
 RUN chmod -R 777 /data
+COPY data-paper /data-paper
+RUN chmod -R 777 /data-paper
 COPY src /src
 
 WORKDIR /src

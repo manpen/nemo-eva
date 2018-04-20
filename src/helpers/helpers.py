@@ -26,8 +26,9 @@ def render_dict(a_dict):
     my_uuid = "render_dict_" + str(_render_dict_counter)  # str(uuid.uuid4())
     _render_dict_counter += 1
     IPython.display.display_html('<div id="{}" style="height: 600px; width:100%;"></div>'.format(my_uuid), raw=True)
+    # this is relative to the notebooks directory:
     IPython.display.display_javascript("""
-    require(["./helpers/renderjson.js"], function() {
+    require(["./renderjson.js"], function() {
       document.getElementById('%s').appendChild(renderjson(%s))
     });
     """ % (my_uuid, json.dumps(a_dict, sort_keys=True)), raw=True)

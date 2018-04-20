@@ -61,10 +61,7 @@ class GraphCrawler(AbstractStage):
         filename = potential_files[0]
         if len(potential_files) > 1:
             print("too many possible file in zip, taking", filename, "/", name)
-        directory = (
-            os.path.dirname(os.path.realpath(__file__)) +
-            "/../data/1-graphs/{}/".format(group)
-        )
+        directory = self._stagepath + group + "/"
         target_filename = name + ".edges"
         target_path = directory + target_filename
         tmp_path = target_path + ".tmp"
@@ -189,5 +186,4 @@ class GraphCrawler(AbstractStage):
 
     def _execute(self):
         loop = asyncio.get_event_loop()
-        # loop.set_default_executor(ProcessPoolExecutor())
         loop.run_until_complete(self.crawl_graphs())
