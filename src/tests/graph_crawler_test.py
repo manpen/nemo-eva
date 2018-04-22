@@ -2,7 +2,9 @@ from csv import DictReader
 import os
 import pytest
 
+from feature_cleaner import FeatureCleaner
 from graph_crawler import GraphCrawler
+from helpers import use_paper_data
 
 
 def is_stage_clean(stage):
@@ -25,12 +27,13 @@ def test_graph_crawler():
             i["Name"] for i in DictReader(crawl_results)
         )
 
-    with open("../data/paper-features.csv") as paper_features:
-        filtered_paper_graphs = set(
-            i["Graph"] for i in DictReader(paper_features)
-            if graph_filter_func(i) and
-            i["Model"] == "real-world"
-        )
+    with use_paper_data():
+        with open(FeatureCleaner.resultspath) as paper_features:
+            filtered_paper_graphs = set(
+                i["Graph"] for i in DictReader(paper_features)
+                if graph_filter_func(i) and
+                i["Model"] == "real-world"
+            )
 
     wrong_names = ["bn-fly-drosophila_medulla_1", "bn-macaque-rhesus_brain_1"]
     filtered_paper_graphs = set(

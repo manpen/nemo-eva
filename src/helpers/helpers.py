@@ -1,11 +1,12 @@
+import contextlib
 import csv
+import json
+import os
 import pandas
 import uuid
 import IPython.display
-import json
 
 from io import StringIO
-
 
 _render_dict_counter = 0
 
@@ -54,3 +55,17 @@ def format_feature_df(df):
     df.sort("Nodes", inplace=True)
     df.sort_index(kind="mergesort", inplace=True)
     df.columns.name = "Feature"
+
+
+@contextlib.contextmanager
+def use_paper_data():
+    old_environ = os.environ.copy()
+    os.environ["DATA_PATH"] = (
+        os.path.dirname(os.path.realpath(__file__)) +
+        "/../../data-paper/"
+    )
+    try:
+        yield
+    finally:
+        os.environ.clear()
+        os.environ.update(old_environ)

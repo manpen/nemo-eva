@@ -6,6 +6,7 @@ import pytest
 from feature_cleaner import FeatureCleaner
 from feature_extractor import FeatureExtractor
 from graph_crawler import GraphCrawler
+from helpers import use_paper_data
 
 
 class HashDict(dict):
@@ -42,8 +43,9 @@ def test_feature_extractor_and_cleaner():
     with open(cleaner.resultspath) as file:
         extracted_features = get_hash_dicts(file)
 
-    with open(extractor._stagepath + "../paper-features.csv") as file:
-        paper_features = get_hash_dicts(file)
+    with use_paper_data():
+        with open(FeatureCleaner.resultspath) as file:
+            paper_features = get_hash_dicts(file)
 
     def get_tuple(x):
         return (x["Graph"], x["Model"])
