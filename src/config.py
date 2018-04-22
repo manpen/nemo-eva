@@ -1,5 +1,6 @@
 import os
 
+
 def data_path():
     return os.environ.get(
         "DATA_PATH",
