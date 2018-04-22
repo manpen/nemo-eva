@@ -23,7 +23,7 @@ class AbstractStage(ABC):
 
     @classproperty
     def _stagepath(self):
-        return data_path + self._stage + "/"
+        return data_path() + self._stage + "/"
 
     @classproperty
     def resultspath(self):
