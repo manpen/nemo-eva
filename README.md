@@ -14,10 +14,7 @@ You can view the paper results rendered on github within this repo:
 * [Graph Features](src/notebooks/graph%20features.ipynb)
 * [Classification Results](src/notebooks/classification%20results.ipynb)
 
-Adapting the notebooks interactively online migth work in the future with binder (TODO):
-[Interactive online notebooks](https://mybinder.org/v2/gh/jstriebel/nemo-eva/master?filepath=src%2Fnotebooks)
-
-To run the experiments and do major changes, please use Docker:
+To run nemo-eva yourself simply use Docker:
 
 ### Docker
 
