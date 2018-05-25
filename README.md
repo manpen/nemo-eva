@@ -66,6 +66,7 @@ Many measures have been take to make the experiments reproducible:
   * The results can be used to run custom classification experiments easily.
 * The features we obtained in the paper should therefore be reproducible.
   * An exception are the BA models. For those the python seed was missing in the version we used for the paper. The results are nevertheless very similar, except for the differences coming from randomization.
+* The classification results differ slightly from the paper, as we simplified the classification in this code. Nevertheless the obained results are comparable and lead to the same conclusions. For the sake of reproducability we might still include this here, if whished (#5).
 * The classification is run without seeding and therefore produces slighltly varying results.
 
 ## Testing & CI
