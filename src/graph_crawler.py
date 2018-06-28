@@ -21,7 +21,9 @@ class GraphCrawler(AbstractStage):
             self, groups=[
                 "bio", "bn", "ca", "chem", "eco", "ia",
                 "inf", "rec", "rt", "soc", "socfb", "tech", "web"],
-            graph_filter_func=lambda x: True):
+            graph_filter_func=lambda x: 
+                0 < x["Nodes"] <= 2*10**6 and 0 < x["Edges"] <= 2*10**7
+            ):
         super(GraphCrawler, self).__init__()
         self.groups = groups
         self.graph_filter_func = graph_filter_func
@@ -121,7 +123,7 @@ class GraphCrawler(AbstractStage):
             "Nodes": headers.index("|V|"),
             "Edges": headers.index("|E|"),
             "Size": headers.index("Size"),
-            "Type": headers.index("Type"),
+            #"Type": headers.index("Type"),
         }
 
         def get_sort_value(element):
@@ -130,20 +132,20 @@ class GraphCrawler(AbstractStage):
         def parse_row(row):
             elements = row.find_all("td")
             return {
-                # "Group": group,
+                "Group": group,
                 "Name": elements[indices["Name"]].text.strip(),
                 "Url": elements[indices["Url"]].find("a").get("href"),
                 "Nodes": get_sort_value(elements[indices["Nodes"]]),
                 "Edges": get_sort_value(elements[indices["Edges"]]),
-                "Size": get_sort_value(elements[indices["Size"]]),
-                "Group": elements[indices["Type"]].text.strip()
+                "Size": get_sort_value(elements[indices["Size"]])
+                #"Group": elements[indices["Type"]].text.strip()
             }
         download_tasks = []
         for row in rows[1:]:
             try:
                 graph_nr_properties = parse_row(row)
             except Exception as e:
-                print("Error parsing html row:", e)
+                print("Error parsing html row:", e, group)
                 continue
             if graph_nr_properties["Group"] != group:
                 continue
@@ -162,7 +164,7 @@ class GraphCrawler(AbstractStage):
                           on_backoff=backoff_hdlr,
                           max_tries=50)
     async def get_page_html(self, session, group):
-        url = "http://networkrepository.com/networks.php"  # {}.php".format(group)
+        url = "http://networkrepository.com/{}.php".format(group)
         async with session.get(url) as response:
             html = await response.text()
             await self.extract_links_from_page(session, group, html)

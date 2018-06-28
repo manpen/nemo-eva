@@ -1,11 +1,13 @@
 import os
 
+from graph_crawler import GraphCrawler
+from feature_extractor import FeatureExtractor
 from feature_cleaner import FeatureCleaner
 from classifier import Classifier
 from csv import DictReader
 
 
-def run_stages(stages, initial_input_data=[], check_clean=True, **initial_kwargs):
+def run_stages(stages, initial_input_data=None, check_clean=True, **initial_kwargs):
     input_data = initial_input_data
     for i, stage in enumerate(stages):
         print("### STAGE", stage.__name__, "###")
@@ -20,15 +22,27 @@ def run_stages(stages, initial_input_data=[], check_clean=True, **initial_kwargs
                 input_dicts = list(DictReader(input_dicts_file))
         else:
             input_dicts = input_data
-        if i == 0:
-            stage(input_dicts, **initial_kwargs).execute()
+        if input_dicts:
+            if i == 0:
+                stage(input_dicts, **initial_kwargs).execute()
+            else:
+                stage(input_dicts).execute()
         else:
-            stage(input_dicts).execute()
+            if i == 0:
+                stage(**initial_kwargs).execute()
+            else:
+                stage().execute()
         input_data = stage.resultspath
 
 
 run_stages(
-    [Classifier],
-    FeatureCleaner.resultspath,
-    check_clean=False
+    [
+        GraphCrawler, 
+        FeatureExtractor, 
+        FeatureCleaner, 
+        Classifier
+    ],
+    #FeatureCleaner.resultspath,
+    #GraphCrawler.resultspath,
+    check_clean=True
 )
