@@ -150,7 +150,7 @@ class FeatureExtractor(AbstractStage):
             edges_added += 1
 
         for i, v in list(enumerate(nodes))[m_0:]:
-            num_new_edges = int((m-edges_added)/(n-i))
+            num_new_edges = min(i, int((m-edges_added)/(n-i)))
             really_new_edges = 0
             to_connect = set()
             while len(to_connect) < num_new_edges:
