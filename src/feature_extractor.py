@@ -223,9 +223,11 @@ class FeatureExtractor(AbstractStage):
                 continuous=True)
         except Exception as e:
             print(e)
+            return
 
         if not g:
             print("could not import graph from path", in_path)
+            return
         if g.numberOfNodes() > 0 and g.numberOfEdges() > 0:
             if g.degree(0) == 0:
                 g.removeNode(0)
@@ -238,6 +240,7 @@ class FeatureExtractor(AbstractStage):
                 str(g.numberOfNodes()) +
                 " nodes, needs 100): " +
                 in_path)
+            return
 
         model_types = [
             ("real-world",
