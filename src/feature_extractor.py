@@ -60,15 +60,14 @@ class FeatureExtractor(AbstractStage):
         return g
 
     def analyze(self, g):
-        # networkit.engineering.setNumberOfThreads(1)
+        networkit.engineering.setNumberOfThreads(1)
         originally_weighted = g.isWeighted()
         if originally_weighted:
             g = g.toUnweighted()
         g.removeSelfLoops()
         g = self.shrink_to_giant_component(g)
         degrees = networkit.centrality.DegreeCentrality(g).run().scores()
-        with PrintBlocker():
-            fit = powerlaw.Fit(degrees, fit_method='Likelihood')
+        fit = powerlaw.Fit(degrees, fit_method='Likelihood', verbose=False)
         stats = {
             "Originally Weighted": originally_weighted,
             "Degree Distribution": {
@@ -103,7 +102,6 @@ class FeatureExtractor(AbstractStage):
             elif key == ['Diameter Range']:
                 output['Diameter Min'] = val[0]
                 output['Diameter Max'] = val[1]
-
         return output
 
     def binary_search(self, goal_f, goal, a, b, f_a=None, f_b=None, depth=0):
@@ -174,17 +172,17 @@ class FeatureExtractor(AbstractStage):
     def fit_hyperbolic(self, g):
         networkit.setSeed(seed=42, useThreadId=False)
         degrees = networkit.centrality.DegreeCentrality(g).run().scores()
-        with PrintBlocker():
-            fit = powerlaw.Fit(degrees, fit_method='Likelihood')
+        fit = powerlaw.Fit(degrees, fit_method='Likelihood', verbose=False)
         gamma = max(fit.alpha, 2.1)
         n, m = g.size()
         degree_counts = collections.Counter(degrees)
         n_hyper = n + max(0, 2*degree_counts[1] - degree_counts[2])
         k = 2 * m / (n_hyper-1)
-
         def criterium(h):
-            with PrintBlocker():
-                return networkit.globals.clustering(h)
+            networkit.setLogLevel("WARNING")
+            val = networkit.globals.clustering(h)
+            networkit.setLogLevel("INFO")
+            return val
         goal = criterium(g)
 
         def guess_goal(t):
@@ -192,7 +190,7 @@ class FeatureExtractor(AbstractStage):
                 n_hyper, k, gamma, t).generate()
             hyper_t = self.shrink_to_giant_component(hyper_t)
             return criterium(hyper_t)
-        t, crit_diff = self.binary_search(guess_goal, goal, 0, 0.99)
+        t, crit_diff = self.binary_search(guess_goal, goal, 0.01, 0.99)
         hyper = networkit.generators.HyperbolicGenerator(
             n_hyper, k, gamma, t).generate()
         info_map = [
@@ -279,7 +277,9 @@ class FeatureExtractor(AbstractStage):
             #    output[key] = float("nan")
 
     def _execute(self):
-        pool = NoDaemonProcessPool()
+        #for graph in self.graph_dicts:
+        #    self._execute_one_graph(graph)
+        pool = NoDaemonProcessPool(20)
         pool.map(self._execute_one_graph, self.graph_dicts)
         pool.close()
         pool.join()
