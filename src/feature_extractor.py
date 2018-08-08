@@ -169,6 +169,11 @@ class FeatureExtractor(AbstractStage):
         networkit.setSeed(seed=42, useThreadId=False)
         return networkit.generators.ChungLuGenerator.fit(g).generate()
 
+    def fit_chung_lu_constant(self, g):
+        networkit.setSeed(seed=42, useThreadId=False)
+        degree_sequence = networkit.generators.PowerlawDegreeSequence(g).run().getDegreeSequence(g.numberOfNodes())
+        return networkit.generators.ChungLuGenerator(degree_sequence).generate()
+
     def fit_hyperbolic(self, g):
         networkit.setSeed(seed=42, useThreadId=False)
         degrees = networkit.centrality.DegreeCentrality(g).run().scores()
@@ -251,6 +256,8 @@ class FeatureExtractor(AbstractStage):
                 lambda x: ("", self.fit_ba(x, fully_connected_start=True))),
             ("chung-lu",
                 lambda x: ("", self.fit_chung_lu(x))),
+            ("chung-lu constant",
+                lambda x: ("", self.fit_chung_lu_constant(x))),
             ("hyperbolic",
                 self.fit_hyperbolic)
         ]
