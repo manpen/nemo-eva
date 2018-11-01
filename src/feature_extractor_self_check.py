@@ -279,24 +279,24 @@ def _execute_one_graph(graph_dict):
     for model_name, model_converter in model_types:
         try:
             info1, model1 = model_converter(g)
-            output1 = self.analyze(model1)
+            output1 = analyze(model1)
             # Retry model based on 
             info2, model2 = model_converter(model1)
-            output2 = self.analyze(model2)
+            output2 = analyze(model2)
         except ZeroDivisionError as e:
-            print("Error:", e, "for", model_name, "of", g.getName(), model)
+            print("Error:", e, "for", model_name, "of", g.getName())
         else:
             output1["Graph"] = g.getName()
             output1["Type"] = graph_type
             output1["Model"] = model_name
-            output1["Info"] = info
+            output1["Info"] = info1
             outputs.append(output1)
 
             output2["Graph"] = g.getName()
             output2["Type"] = graph_type
             output2["Model"] = model_name + "-second"
-            output2["Info"] = info
-            outputs.append(output1)
+            output2["Info"] = info2
+            outputs.append(output2)
             # all_keys |= set(output.keys())
 
     # for model_name, info, output in sorted(outputs):
@@ -317,7 +317,7 @@ class FeatureExtractorSelfCheck(AbstractStage):
         #    self._execute_one_graph(graph)
         count = 0
         total = len(self.graph_dicts)
-        pool = multiprocessing.pool.Pool(32)
+        pool = multiprocessing.pool.Pool(20)
         for results in pool.imap_unordered(_execute_one_graph, self.graph_dicts):
             for result in results:
                 self._save_as_csv(result)

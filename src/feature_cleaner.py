@@ -52,7 +52,7 @@ class FeatureCleaner(AbstractStage):
         df_real = df_cleaned[df_cleaned["Model"] == "real-world"]
         filters = {
             "CC = 0": df_real["Centrality.ClusteringCoefficient.Location.Arithmetic Mean"] == 0,
-            "edges < 50": df_real["Edges"] < 500,
+            "edges < 500": df_real["Edges"] < 500,
             "nodes < 100": df_real["Nodes"] < 100
         }
         all_filters = reduce(lambda x, y: x | y, filters.values())

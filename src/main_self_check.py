@@ -38,11 +38,11 @@ def run_stages(stages, initial_input_data=None, check_clean=True, **initial_kwar
 run_stages(
     [
         #GraphCrawler, 
-        FeatureExtractorSelfCheck, 
+        #FeatureExtractorSelfCheck, 
         FeatureCleaner, 
         ClassifierSelfCheck
     ],
-    #FeatureCleaner.resultspath,
-    GraphCrawler.resultspath,
+    FeatureExtractorSelfCheck.resultspath,
+    #GraphCrawler.resultspath,
     check_clean=False
 )

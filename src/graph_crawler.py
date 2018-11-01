@@ -22,7 +22,7 @@ class GraphCrawler(AbstractStage):
                 "bio", "bn", "ca", "chem", "eco", "ia",
                 "inf", "rec", "rt", "soc", "socfb", "tech", "web"],
             graph_filter_func=lambda x: 
-                0 < x["Nodes"] <= 2*10**6 and 0 < x["Edges"] <= 2*10**7
+                100 <= x["Nodes"] <= 2*10**6 and 100 < x["Edges"] <= 2*10**7
             ):
         super(GraphCrawler, self).__init__()
         self.groups = groups
@@ -43,7 +43,13 @@ class GraphCrawler(AbstractStage):
         with open(in_path) as infile:
             with open(out_path, "w") as outfile:
                 for line in infile:
-                    reduced_line = " ".join(line.split(" ")[:3])
+                    delimiter = " "
+                    # Account for lines delimited by comma
+                    if "," in line:
+                        delimiter = ","
+                    elif "\t" in line:
+                        delimiter = "\t"
+                    reduced_line = " ".join(line.split(delimiter)[:3])
                     outfile.write(reduced_line)
 
     @backoff.on_exception(backoff.expo,

@@ -96,10 +96,14 @@ def generate_inflated_feature_sets(df):
     feature_sets = {}
     for a in aliases:
         inflated = inflate_feature_set(a)
+        all_features_present = True
         for group in inflated.values():
             for f in group:
-                assert(f in df.columns)
-        feature_sets.update(inflated)
+                if f not in df.columns:
+                    all_features_present = False
+                    print("Warning: missing feature {}".format(f))
+        if all_features_present:
+            feature_sets.update(inflated)
     return feature_sets
 
 

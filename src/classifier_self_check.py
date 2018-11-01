@@ -62,7 +62,7 @@ class ClassifierSelfCheck(AbstractStage):
     _stage = "4-classification_results"
 
     def __init__(self, features):
-        super(Classifier, self).__init__()
+        super(ClassifierSelfCheck, self).__init__()
         self.features = features
 
     def _execute(self):
