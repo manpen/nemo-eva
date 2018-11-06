@@ -10,7 +10,7 @@ from helpers import dicts_to_df
 class FeatureCleaner(AbstractStage):
     _stage = "3-cleaned_features"
 
-    def __init__(self, features):
+    def __init__(self, features, **kwargs):
         super(FeatureCleaner, self).__init__()
         self.features = features
 

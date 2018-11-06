@@ -91,7 +91,20 @@ def generate_inflated_feature_sets(df):
         ["Nodes", "Edges", "Partition.CoreDecomposition"],
         ["Nodes", "Edges", "ClusteringCoefficient", "Partition.Communities"],
         ["Nodes", "Edges", "ClusteringCoefficient", "Partition.CoreDecomposition"],
-        ["Nodes", "Edges", "Centrality.CoreDecomposition", "Partition.CoreDecomposition"]
+        ["Nodes", "Edges", "Centrality.CoreDecomposition", "Partition.CoreDecomposition"],
+        ["Nodes"],
+        ["Edges"],
+        ["Centrality.CoreDecomposition"],
+        ["ClusteringCoefficient"],
+        ["Degree Distribution.Powerlaw.Alpha"],
+        ["Degree"],
+        ["Diameter"],
+        ["Betweenness"],
+        ["Closeness"],
+        ["Katz"],
+        ["PageRank"],
+        ["Partition.Communities"],
+        ["Partition.CoreDecomposition"]
     ]
     feature_sets = {}
     for a in aliases:

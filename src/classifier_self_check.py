@@ -4,23 +4,34 @@ from helpers.classification import Classification
 from helpers.feature_sets import get_all_feature_sets
 
 import collections
+import functools
+import multiprocessing
 import pandas
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
+def run_classifier(params, df, Y, model, network_model_mask):
+    features_name, features = params
+    X = df[features]
+    c = Classification(
+        X.loc[network_model_mask],
+        Y.loc[network_model_mask],
+        **model
+    )
+    cv_acc = c.results["cv"]["accuracy"]
+    return features_name, cv_acc
 
-def classification_experiment(df, network_models, features_collection, printing=False):
+def classification_experiment(df, network_models, features_collection, cores):
     Y = df["Model"]
 
-    models = {
-        "svm": {
+    model = {
+        # SVM
             "model": make_pipeline(StandardScaler(), SVC()),  # kernel="rbf", cache_size=500
             "cv_grid": {
                 "svc__C": [10 ** exp for exp in range(5)],
                 "svc__gamma": [10 ** -exp for exp in range(5)]
             }
-        },
         # {
         #     "model": DummyClassifier,
         #     "params": {"strategy": "most_frequent"}
@@ -29,41 +40,30 @@ def classification_experiment(df, network_models, features_collection, printing=
 
     accuracies = pandas.DataFrame()
 
-    cv_best_misclassified_masks = collections.defaultdict(dict)
-    model_masks = {}
 
     for network_model in network_models:
-        if printing:
-            print("Model", network_model)
         network_model_mask = (df["Model"] == network_model) | (df["Model"] == network_model + "-second")
-        model_masks[network_model] = network_model_mask
 
-        for features_name, features in sorted(features_collection.items()):
-            if printing:
-                print("Feature set", features_name)
-            X = df[features]
-            best_accuracy = 0
-            for model_name, model in models.items():
-                c = Classification(
-                    X.loc[network_model_mask],
-                    Y.loc[network_model_mask],
-                    **model
-                )
-                cv_acc = c.results["cv"]["accuracy"]
-                accuracies.loc[network_model, features_name] = cv_acc
-                if cv_acc > best_accuracy:
-                    best_accuracy = cv_acc
-                    cv_best_misclassified_masks[features_name][network_model] = c.results["cv"]["mask"]
+        
+        count = 0
+        total = len(features_collection)
+        pool = multiprocessing.pool.Pool(cores)
+        classifier_function = functools.partial(run_classifier, df=df, Y=Y, model=model, network_model_mask=network_model_mask)
+        for features_name, cv_acc in pool.imap(classifier_function, sorted(features_collection.items())):
+            accuracies.loc[network_model, features_name] = cv_acc
+            count += 1
+            print("{}/{} feature sets done!".format(count, total))
     else:
-        return (accuracies, model_masks, cv_best_misclassified_masks)
+        return accuracies
 
 
 class ClassifierSelfCheck(AbstractStage):
-    _stage = "4-classification_results"
+    _stage = "4-classification_results_self_check"
 
-    def __init__(self, features):
+    def __init__(self, features, cores=1, **kwargs):
         super(ClassifierSelfCheck, self).__init__()
         self.features = features
+        self.cores = cores
 
     def _execute(self):
         df = dicts_to_df(self.features)
@@ -84,7 +84,7 @@ class ClassifierSelfCheck(AbstractStage):
 
         format_str = "{:20}{:>5}"
         #network_models = sorted(set(df["Model"])-set(["real-world"]))
-        network_models = sorted(["real-world", "ER", "BA circle", "BA full", "chung-lu", "hyperbolic"])
+        network_models = sorted(["real-world", "ER", "BA circle", "BA full", "chung-lu", "chung-lu constant", "hyperbolic"])
 
         for filtername, filterdf in sorted(filters.items()):
             graphs = sorted(df_real[filterdf]["Graph"])
@@ -92,12 +92,12 @@ class ClassifierSelfCheck(AbstractStage):
 
             features_collection = get_all_feature_sets(df, graphs)
             sub_df = df.loc(axis=0)[:, graphs, :]
-            accuracies, model_masks, cv_best_misclassified_masks = \
+            accuracies = \
                 classification_experiment(
                     sub_df,
                     network_models,
                     features_collection,
-                    printing=False)
+                    self.cores)
             accuracies.to_csv(
                 self._stagepath + "accuracies/" + filtername + ".csv",
                 header=True,

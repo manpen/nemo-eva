@@ -22,7 +22,8 @@ class GraphCrawler(AbstractStage):
                 "bio", "bn", "ca", "chem", "eco", "ia",
                 "inf", "rec", "rt", "soc", "socfb", "tech", "web"],
             graph_filter_func=lambda x: 
-                100 <= x["Nodes"] <= 2*10**6 and 100 < x["Edges"] <= 2*10**7
+                100 <= x["Nodes"] <= 2*10**6 and 100 < x["Edges"] <= 2*10**7,
+                **kwargs
             ):
         super(GraphCrawler, self).__init__()
         self.groups = groups

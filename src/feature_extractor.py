@@ -299,9 +299,10 @@ def _execute_one_graph(graph_dict):
 class FeatureExtractor(AbstractStage):
     _stage = "2-features"
 
-    def __init__(self, graph_dicts):
+    def __init__(self, graph_dicts, cores=1, **kwargs):
         super(FeatureExtractor, self).__init__()
         self.graph_dicts = graph_dicts
+        self.cores = cores
         networkit.engineering.setNumberOfThreads(1)
 
     def _execute(self):
@@ -309,7 +310,7 @@ class FeatureExtractor(AbstractStage):
         #    self._execute_one_graph(graph)
         count = 0
         total = len(self.graph_dicts)
-        pool = multiprocessing.pool.Pool(32)
+        pool = multiprocessing.pool.Pool(self.cores)
         for results in pool.imap_unordered(_execute_one_graph, self.graph_dicts):
             for result in results:
                 self._save_as_csv(result)

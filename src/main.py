@@ -7,7 +7,7 @@ from classifier import Classifier
 from csv import DictReader
 
 
-def run_stages(stages, initial_input_data=None, check_clean=True, **initial_kwargs):
+def run_stages(stages, initial_input_data=None, check_clean=True, **kwargs):
     input_data = initial_input_data
     for i, stage in enumerate(stages):
         print("### STAGE", stage.__name__, "###")
@@ -23,15 +23,9 @@ def run_stages(stages, initial_input_data=None, check_clean=True, **initial_kwar
         else:
             input_dicts = input_data
         if input_dicts:
-            if i == 0:
-                stage(input_dicts, **initial_kwargs).execute()
-            else:
-                stage(input_dicts).execute()
+            stage(input_dicts, **kwargs).execute()
         else:
-            if i == 0:
-                stage(**initial_kwargs).execute()
-            else:
-                stage().execute()
+            stage(**kwargs).execute()
         input_data = stage.resultspath
 
 
@@ -44,5 +38,7 @@ run_stages(
     ],
     #GraphCrawler.resultspath,
     FeatureExtractor.resultspath,
-    check_clean=False
+    #FeatureCleaner.resultspath,
+    check_clean=False,
+    cores=4
 )
