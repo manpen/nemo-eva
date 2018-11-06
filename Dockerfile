@@ -6,8 +6,6 @@ RUN apk --no-cache add --virtual build-deps \
         bash g++ freetype-dev gfortran lapack-dev \
         libpng-dev make ncurses-dev readline-dev \
  && cat requirements.txt | xargs -n 1 pip3 install \
- && sed -i '912s/nam\-e/name/' \
-        /usr/local/lib/python3.6/site-packages/networkit/profiling/profiling.py \
  && apk del build-deps
 
 RUN apk --no-cache add make libgomp libstdc++ lapack xvfb

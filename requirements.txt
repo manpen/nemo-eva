@@ -1,21 +1,23 @@
-numpy==1.8.*
-scipy==0.14.*
-scikit-learn==0.19.*
+numpy==1.15.*
+scipy==1.1.*
+scikit-learn==0.20.*
+Cython==0.29.*
+pandas==0.23.*
+seaborn
+tabulate
+matplotlib
+networkx==2.*
+ipython==7.1.*
+
+networkit==4.6
 
 aiohttp
 backoff
 beautifulsoup4
-ipython==6.2.*
-matplotlib
 mpmath==1.0.*
-networkit==4.1.1
-networkx==2.*
 packaging
-pandas==0.14.*
 plotly
 powerlaw==1.4.*
 readline
-seaborn
-tabulate
 
 jupyter

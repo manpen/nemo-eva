@@ -26,4 +26,4 @@ services:
     volumes:
       - "./data:/data"
       - "./data-paper:/data-paper"
-      - "./src:/src"
+      - "./src:/src:ro"

@@ -51,10 +51,15 @@ def dicts_to_df(dicts):
 
 
 def format_feature_df(df):
+    # convert ints to floats
+    int_cols = df.columns[df.dtypes == int]
+    df[int_cols] = df[int_cols].astype(float)
+
     df.set_index(["Type", "Graph", "Model"], inplace=True, drop=False, verify_integrity=True)
     df.sort_values("Nodes", inplace=True)
     df.sort_index(kind="mergesort", inplace=True)
     df.columns.name = "Feature"
+
 
 
 @contextlib.contextmanager
