@@ -305,7 +305,7 @@ def _execute_one_graph(graph_dict):
     return outputs
             
 class FeatureExtractorSelfCheck(AbstractStage):
-    _stage = "2-features"
+    _stage = "2-features_self_check"
 
     def __init__(self, graph_dicts, cores=1, **kwargs):
         super(FeatureExtractorSelfCheck, self).__init__()
