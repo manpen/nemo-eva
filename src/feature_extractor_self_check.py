@@ -173,8 +173,9 @@ def fit_chung_lu_constant(g):
     
     generator = networkit.generators.PowerlawDegreeSequence(g)
 
-    generator.setGamma(-(gamma+1))
-    generator.setMinimumFromAverageDegree(k)
+    generator.setGamma(-gamma)
+    generator.run()
+    generator.setMinimumFromAverageDegree(max(generator.getExpectedAverageDegree(), k))
     
     degree_sequence = generator.run().getDegreeSequence(g.numberOfNodes())
     graph = networkit.generators.ChungLuGenerator(degree_sequence).generate()

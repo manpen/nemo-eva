@@ -92,7 +92,7 @@ class FeatureCleaner(AbstractStage):
         for col in sorted(nan_cols):
             print("    " + col)
         df_finite_filtered = df_rule_filtered[list(valid_cols - nan_cols)]
-        assert not numpy.any(notfinite(df_finite_filtered))
+        assert not notfinite(df_finite_filtered).any().any()
 
         valid_cols = set(df_finite_filtered.columns)
         # normalized coefficient of variation:

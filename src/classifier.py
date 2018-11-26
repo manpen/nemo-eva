@@ -54,6 +54,7 @@ def classification_experiment(df, network_models, features_collection, cores):
             count += 1
             print("{}/{} feature sets done!".format(count, total))
     else:
+        pool.terminate()
         return accuracies
 
 
