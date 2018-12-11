@@ -3,6 +3,7 @@ import os
 from graph_crawler import GraphCrawler
 from feature_extractor_self_check import FeatureExtractorSelfCheck
 from feature_cleaner import FeatureCleaner
+from feature_differ_self_check import FeatureDifferSelfCheck
 from classifier_self_check import ClassifierSelfCheck
 from csv import DictReader
 
@@ -33,12 +34,13 @@ run_stages(
     [
         #GraphCrawler, 
         #FeatureExtractorSelfCheck, 
-        FeatureCleaner, 
+        #FeatureCleaner,
+        FeatureDifferSelfCheck,
         ClassifierSelfCheck
     ],
     #GraphCrawler.resultspath,
-    FeatureExtractorSelfCheck.resultspath,
-    #FeatureCleaner.resultspath,
+    #FeatureExtractorSelfCheck.resultspath,
+    FeatureCleaner.resultspath,
     check_clean=False,
     cores=4
 )

@@ -84,8 +84,8 @@ class ClassifierSelfCheck(AbstractStage):
         }
 
         format_str = "{:20}{:>5}"
-        #network_models = sorted(set(df["Model"])-set(["real-world"]))
-        network_models = sorted(["real-world", "ER", "BA circle", "BA full", "chung-lu", "chung-lu constant", "hyperbolic"])
+
+        network_models = sorted(set(filter(lambda model: not model.endswith("-second"), set(df["Model"])))-set(["real-world"]))
 
         for filtername, filterdf in sorted(filters.items()):
             graphs = sorted(df_real[filterdf]["Graph"])

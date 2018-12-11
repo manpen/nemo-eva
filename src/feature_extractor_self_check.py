@@ -259,8 +259,6 @@ def _execute_one_graph(graph_dict):
         return []
 
     model_types = [
-        ("real-world",
-            lambda x: ("", x)),
         ("ER",
             lambda x: ("", fit_er(x))),
         ("BA circle",
@@ -276,6 +274,13 @@ def _execute_one_graph(graph_dict):
     ]
 
     outputs = []
+    real_output = analyze(g)
+    real_output["Graph"] = g.getName()
+    real_output["Type"] = graph_type
+    real_output["Model"] = "real-world"
+    real_output["Info"] = "" 
+    outputs.append(real_output)
+
     # all_keys = set()
     for model_name, model_converter in model_types:
         try:
