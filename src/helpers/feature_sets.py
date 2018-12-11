@@ -57,55 +57,8 @@ def inflate_feature_set(feature_set_aliases):
     return inflated
 
 
-def generate_inflated_feature_sets(df):
-    aliases = [
-        ["Nodes", "Edges", "Centrality.CoreDecomposition"],
-        ["Nodes", "Edges"],
-        ["Nodes", "Edges", "ClusteringCoefficient"],
-        ["Nodes", "Edges", "Degree Distribution.Powerlaw.Alpha"],
-        ["Nodes", "Edges", "ClusteringCoefficient", "Degree Distribution.Powerlaw.Alpha"],
-        ["Nodes", "Edges", "Degree"],
-        ["Nodes", "Edges", "Degree", "ClusteringCoefficient"],
-        ["Nodes", "Edges", "Diameter"],
-        ["Nodes", "Edges", "ClusteringCoefficient", "Diameter"],
-        ["Nodes", "Edges", "ClusteringCoefficient", "Diameter", "Degree Distribution.Powerlaw.Alpha"],
-        ["ClusteringCoefficient", "Diameter", "Degree Distribution.Powerlaw.Alpha"],
-        ["Nodes", "Edges", "Betweenness"],
-        ["Nodes", "Edges", "Degree", "Betweenness"],
-        ["Nodes", "Edges", "ClusteringCoefficient", "Betweenness"],
-        ["Nodes", "Edges", "Betweenness", "Closeness", "Diameter"],
-        ["Betweenness", "Closeness", "Diameter"],
-        ["Nodes", "Edges", "Closeness"],
-        ["Nodes", "Edges", "Centrality.CoreDecomposition"],
-        ["Nodes", "Edges", "Katz"],
-        ["Nodes", "Edges", "PageRank"],
-        ["Nodes", "Edges", "Closeness", "ClusteringCoefficient"],
-        ["Nodes", "Edges", "Centrality.CoreDecomposition", "ClusteringCoefficient"],
-        ["Nodes", "Edges", "Katz", "ClusteringCoefficient"],
-        ["Nodes", "Edges", "PageRank", "ClusteringCoefficient"],
-        ["Nodes", "Edges", "Closeness", "Degree"],
-        ["Nodes", "Edges", "Centrality.CoreDecomposition", "Degree"],
-        ["Nodes", "Edges", "Katz", "Degree"],
-        ["Nodes", "Edges", "PageRank", "Degree"],
-        ["Nodes", "Edges", "Partition.Communities"],
-        ["Nodes", "Edges", "Partition.CoreDecomposition"],
-        ["Nodes", "Edges", "ClusteringCoefficient", "Partition.Communities"],
-        ["Nodes", "Edges", "ClusteringCoefficient", "Partition.CoreDecomposition"],
-        ["Nodes", "Edges", "Centrality.CoreDecomposition", "Partition.CoreDecomposition"],
-        ["Nodes"],
-        ["Edges"],
-        ["Centrality.CoreDecomposition"],
-        ["ClusteringCoefficient"],
-        ["Degree Distribution.Powerlaw.Alpha"],
-        ["Degree"],
-        ["Diameter"],
-        ["Betweenness"],
-        ["Closeness"],
-        ["Katz"],
-        ["PageRank"],
-        ["Partition.Communities"],
-        ["Partition.CoreDecomposition"]
-    ]
+def generate_inflated_feature_sets(df, aliases):
+    
     feature_sets = {}
     for a in aliases:
         inflated = inflate_feature_set(a)
@@ -199,6 +152,68 @@ def get_uncorrelated_features(df, graphs):
 
 
 def get_all_feature_sets(df, graphs):
-    feature_sets = generate_inflated_feature_sets(df)
+    aliases = [
+        ["Nodes", "Edges", "Centrality.CoreDecomposition"],
+        ["Nodes", "Edges"],
+        ["Nodes", "Edges", "ClusteringCoefficient"],
+        ["Nodes", "Edges", "Degree Distribution.Powerlaw.Alpha"],
+        ["Nodes", "Edges", "ClusteringCoefficient", "Degree Distribution.Powerlaw.Alpha"],
+        ["Nodes", "Edges", "Degree"],
+        ["Nodes", "Edges", "Degree", "ClusteringCoefficient"],
+        ["Nodes", "Edges", "Diameter"],
+        ["Nodes", "Edges", "ClusteringCoefficient", "Diameter"],
+        ["Nodes", "Edges", "ClusteringCoefficient", "Diameter", "Degree Distribution.Powerlaw.Alpha"],
+        ["ClusteringCoefficient", "Diameter", "Degree Distribution.Powerlaw.Alpha"],
+        ["Nodes", "Edges", "Betweenness"],
+        ["Nodes", "Edges", "Degree", "Betweenness"],
+        ["Nodes", "Edges", "ClusteringCoefficient", "Betweenness"],
+        ["Nodes", "Edges", "Betweenness", "Closeness", "Diameter"],
+        ["Betweenness", "Closeness", "Diameter"],
+        ["Nodes", "Edges", "Closeness"],
+        ["Nodes", "Edges", "Centrality.CoreDecomposition"],
+        ["Nodes", "Edges", "Katz"],
+        ["Nodes", "Edges", "PageRank"],
+        ["Nodes", "Edges", "Closeness", "ClusteringCoefficient"],
+        ["Nodes", "Edges", "Centrality.CoreDecomposition", "ClusteringCoefficient"],
+        ["Nodes", "Edges", "Katz", "ClusteringCoefficient"],
+        ["Nodes", "Edges", "PageRank", "ClusteringCoefficient"],
+        ["Nodes", "Edges", "Closeness", "Degree"],
+        ["Nodes", "Edges", "Centrality.CoreDecomposition", "Degree"],
+        ["Nodes", "Edges", "Katz", "Degree"],
+        ["Nodes", "Edges", "PageRank", "Degree"],
+        ["Nodes", "Edges", "Partition.Communities"],
+        ["Nodes", "Edges", "Partition.CoreDecomposition"],
+        ["Nodes", "Edges", "ClusteringCoefficient", "Partition.Communities"],
+        ["Nodes", "Edges", "ClusteringCoefficient", "Partition.CoreDecomposition"],
+        ["Nodes", "Edges", "Centrality.CoreDecomposition", "Partition.CoreDecomposition"],
+        ["Nodes"],
+        ["Edges"],
+        ["Centrality.CoreDecomposition"],
+        ["ClusteringCoefficient"],
+        ["Degree Distribution.Powerlaw.Alpha"],
+        ["Degree"],
+        ["Diameter"],
+        ["Betweenness"],
+        ["Closeness"],
+        ["Katz"],
+        ["PageRank"],
+        ["Partition.Communities"],
+        ["Partition.CoreDecomposition"]
+    ]
+
+    feature_sets = generate_inflated_feature_sets(df, aliases)
     feature_sets["all (uncorrelated)"] = get_uncorrelated_features(df, graphs)
+    return feature_sets
+
+def get_all_feature_sets_self_check(df, graphs):
+    aliases = [
+        ["Nodes", "Edges"],
+        ["Nodes"],
+        ["Edges"],
+        ["ClusteringCoefficient"],
+        ["Degree Distribution.Powerlaw.Alpha"],
+        ["Degree"],
+    ]
+
+    feature_sets = generate_inflated_feature_sets(df, aliases)
     return feature_sets

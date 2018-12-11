@@ -1,7 +1,7 @@
 from abstract_stage import AbstractStage
 from helpers import dicts_to_df, format_feature_df
 from helpers.classification import Classification
-from helpers.feature_sets import get_all_feature_sets
+from helpers.feature_sets import get_all_feature_sets_self_check
 
 import collections
 import functools
@@ -91,7 +91,7 @@ class ClassifierSelfCheck(AbstractStage):
             graphs = sorted(df_real[filterdf]["Graph"])
             print(format_str.format(filtername, len(graphs)))
 
-            features_collection = get_all_feature_sets(df, graphs)
+            features_collection = get_all_feature_sets_self_check(df, graphs)
             sub_df = df.loc(axis=0)[:, graphs, :]
             accuracies = \
                 classification_experiment(

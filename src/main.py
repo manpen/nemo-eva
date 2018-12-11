@@ -32,12 +32,12 @@ def run_stages(stages, initial_input_data=None, check_clean=True, **kwargs):
 run_stages(
     [
         #GraphCrawler, 
-        #FeatureExtractor, 
+        FeatureExtractor, 
         FeatureCleaner, 
         Classifier
     ],
-    #GraphCrawler.resultspath,
-    FeatureExtractor.resultspath,
+    GraphCrawler.resultspath,
+    #FeatureExtractor.resultspath,
     #FeatureCleaner.resultspath,
     check_clean=False,
     cores=4
