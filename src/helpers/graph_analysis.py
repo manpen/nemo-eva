@@ -1,5 +1,6 @@
 import networkit
-import powerlaw
+
+from helpers.powerlaw_estimation import powerlaw_fit
 
 def getDeepValue(a_dict, keylist):
     for subkey in keylist:
@@ -34,13 +35,13 @@ def analyze(g):
     g.removeSelfLoops()
     g = shrink_to_giant_component(g)
     degrees = networkit.centrality.DegreeCentrality(g).run().scores()
-    fit = powerlaw.Fit(degrees, fit_method='Likelihood', verbose=False)
+    powerlaw_alpha = powerlaw_fit(degrees)
     stats = {
         "Originally Weighted": originally_weighted,
         "Degree Distribution": {
             "Powerlaw": {
-                "Alpha": fit.alpha,
-                "KS Distance": fit.power_law.KS()
+                "Alpha": powerlaw_alpha
+                #"KS Distance": fit.power_law.KS()
             }
         }
     }

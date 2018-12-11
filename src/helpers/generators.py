@@ -2,11 +2,10 @@ import random
 import itertools
 import math
 import networkit
-import powerlaw
 import collections
 
 from helpers.graph_analysis import shrink_to_giant_component
-
+from helpers.powerlaw_estimation import powerlaw_fit
 
 def binary_search(goal_f, goal, a, b, f_a=None, f_b=None, depth=0):
     if f_a is None:
@@ -75,10 +74,8 @@ def fit_chung_lu(g):
 def fit_chung_lu_constant(g):
     networkit.setSeed(seed=42, useThreadId=False)
     degrees = networkit.centrality.DegreeCentrality(g).run().scores()
-    fit = powerlaw.Fit(degrees, fit_method='Likelihood', verbose=False)
-    gamma = max(fit.alpha, 2.1)
-    #xmin = int(fit.xmin)
-    #xmax = int(fit.xmax) if fit.xmax else max(degrees)
+    alpha = powerlaw_fit(degrees)
+    gamma = max(alpha, 2.1)
 
     k = 2 * g.numberOfEdges() / g.numberOfNodes()
     
@@ -102,8 +99,8 @@ def fit_chung_lu_constant(g):
 def fit_hyperbolic(g):
     networkit.setSeed(seed=42, useThreadId=False)
     degrees = networkit.centrality.DegreeCentrality(g).run().scores()
-    fit = powerlaw.Fit(degrees, fit_method='Likelihood', verbose=False)
-    gamma = max(fit.alpha, 2.1)
+    alpha = powerlaw_fit(degrees)
+    gamma = max(alpha, 2.1)
     n, m = g.size()
     degree_counts = collections.Counter(degrees)
     n_hyper = n + max(0, 2*degree_counts[1] - degree_counts[2])
