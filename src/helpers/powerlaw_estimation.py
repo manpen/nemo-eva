@@ -6,6 +6,8 @@ import helpers.tail_estimation as pl
 #    return fit.alpha
 
 def powerlaw_fit(degrees):
+    # Apply noise
+    pl.add_uniform_noise(degrees, p=1)
     degrees.sort(reverse=True)
     try:
         result = pl.hill_estimator(degrees)
