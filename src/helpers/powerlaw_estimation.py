@@ -1,3 +1,4 @@
+import numpy as np
 import powerlaw
 import helpers.tail_estimation as pl
 
@@ -6,9 +7,10 @@ import helpers.tail_estimation as pl
 #    return fit.alpha
 
 def powerlaw_fit(degrees):
+    degrees = np.array(degrees)
     # Apply noise
-    pl.add_uniform_noise(degrees, p=1)
-    degrees.sort(reverse=True)
+    degrees = pl.add_uniform_noise(degrees, p=1)
+    degrees[::-1].sort()
     try:
         result = pl.hill_estimator(degrees)
         alpha = 1 + 1 / result[3]
