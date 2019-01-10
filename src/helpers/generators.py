@@ -7,6 +7,33 @@ import collections
 from helpers.graph_analysis import shrink_to_giant_component
 from helpers.powerlaw_estimation import powerlaw_fit
 
+# Generate a random tree, return the edge list
+# Based on the Aldous-Broder algorithm, but modified for a complete graph
+# TODO: Currently runs in O(n log n).
+def random_tree(n):
+    edges = []
+    vertices = list(range(n))
+    random.shuffle(vertices)
+    current_pos = 0
+    visited_count = 1
+    while visited_count < n:
+
+        # Repeat random walk until we see new vertex
+        while True:
+            potential_next = random.randrange(n)
+            if potential_next == current_pos:
+                continue
+            if potential_next >= visited_count:
+                break
+            
+            current_pos = potential_next
+
+        next_pos = visited_count
+        edges.append((vertices[current_pos], vertices[next_pos]))
+        visited_count += 1
+        current_pos = next_pos
+    return edges
+
 def binary_search(goal_f, goal, a, b, f_a=None, f_b=None, depth=0):
     if f_a is None:
         f_a = goal_f(a)
@@ -28,8 +55,20 @@ def binary_search(goal_f, goal, a, b, f_a=None, f_b=None, depth=0):
     return min([(a, f_a), (b, f_b), (m, f_m)], key=lambda x: x[1])
 
 def fit_er(g):
+    random.seed(42, version=2)
     networkit.setSeed(seed=42, useThreadId=False)
-    return networkit.generators.ErdosRenyiGenerator.fit(g).generate()
+    n, m = g.size()
+
+    p = ((2*m)/(n-1)-2)/(n-2)
+
+    graph = networkit.generators.ErdosRenyiGenerator(n, p).generate()
+
+    tree_edges = random_tree(n)
+    for u, v in tree_edges:
+        if not graph.hasEdge(graph.nodes()[u], graph.nodes()[v]):
+            graph.addEdge(graph.nodes()[u], graph.nodes()[v])
+
+    return graph
 
 def fit_ba(g, fully_connected_start):
     random.seed(42, version=2)
