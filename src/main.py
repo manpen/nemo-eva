@@ -1,7 +1,7 @@
 import os
 
 from graph_crawler import GraphCrawler
-from feature_extractor import FeatureExtractor
+from random_feature_extractor import RandomizedFeatureExtractor
 from feature_cleaner import FeatureCleaner
 from classifier import Classifier
 from csv import DictReader
@@ -31,8 +31,8 @@ def run_stages(stages, initial_input_data=None, check_clean=True, **kwargs):
 
 run_stages(
     [
-        #GraphCrawler, 
-        FeatureExtractor, 
+        #GraphCrawler,
+        RandomizedFeatureExtractor,
         FeatureCleaner, 
         Classifier
     ],
@@ -40,5 +40,5 @@ run_stages(
     #FeatureExtractor.resultspath,
     #FeatureCleaner.resultspath,
     check_clean=False,
-    cores=4
+    cores=12
 )
